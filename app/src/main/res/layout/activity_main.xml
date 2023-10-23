@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/nameMusic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:text="Тишина"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Play"
+        app:layout_constraintEnd_toEndOf="@+id/nameMusic"
+        app:layout_constraintStart_toStartOf="@+id/nameMusic"
+        app:layout_constraintTop_toBottomOf="@+id/nameMusic" />
+
+    <Button
+        android:id="@+id/back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button"
+        app:layout_constraintBottom_toBottomOf="@+id/start"
+        app:layout_constraintEnd_toStartOf="@+id/start"
+        app:layout_constraintTop_toTopOf="@+id/start" />
+
+    <Button
+        android:id="@+id/next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button"
+        app:layout_constraintBottom_toBottomOf="@+id/start"
+        app:layout_constraintStart_toEndOf="@+id/start"
+        app:layout_constraintTop_toTopOf="@+id/start" />
+
+    <Button
+        android:id="@+id/pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pause"
+        app:layout_constraintEnd_toEndOf="@+id/next"
+        app:layout_constraintStart_toStartOf="@+id/back"
+        app:layout_constraintTop_toBottomOf="@+id/start" />
+
+    <Button
+        android:id="@+id/notify"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Notiy"
+        app:layout_constraintEnd_toEndOf="@+id/pause"
+        app:layout_constraintStart_toStartOf="@+id/pause"
+        app:layout_constraintTop_toBottomOf="@+id/pause" />
+
+    <Button
+        android:id="@+id/startBackground"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Background"
+        app:layout_constraintEnd_toEndOf="@+id/notify"
+        app:layout_constraintStart_toStartOf="@+id/notify"
+        app:layout_constraintTop_toBottomOf="@+id/notify" />
+
+    <Button
+        android:id="@+id/startForeground"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Foreground"
+        app:layout_constraintEnd_toEndOf="@+id/startBackground"
+        app:layout_constraintStart_toStartOf="@+id/startBackground"
+        app:layout_constraintTop_toBottomOf="@+id/startBackground" />
+
+    <Button
+        android:id="@+id/startBound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Bound"
+        app:layout_constraintEnd_toEndOf="@+id/startForeground"
+        app:layout_constraintStart_toStartOf="@+id/startForeground"
+        app:layout_constraintTop_toBottomOf="@+id/startForeground" />
+
+    <Button
+        android:id="@+id/startWork"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Work"
+        app:layout_constraintEnd_toEndOf="@+id/startBound"
+        app:layout_constraintStart_toStartOf="@+id/startBound"
+        app:layout_constraintTop_toBottomOf="@+id/startBound" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
