@@ -64,6 +64,12 @@ class MyService : Service() {
         }
 
         val nextPendingIntent = PendingIntent.getService(this, 3, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+//        val seekIntent = Intent(this, MyService::class.java).apply {
+//            action = "SEEK"
+//            putExtra("seekTo", newPosition)
+//        }
+//        startService(seekIntent)
+
 
             val notification = NotificationCompat.Builder(this, channelId)
                 .setSmallIcon(R.drawable.ic_music)
@@ -79,14 +85,21 @@ class MyService : Service() {
                 .setStyle(
                     MediaStyle()
                         .setShowActionsInCompactView(0, 1, 2, 3)
+//                        .setShowProgressBar(true)
+                        .setMediaSession(null)
                 )
+
+
+
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(false)
                 .setOngoing(true)
+                .setProgress(mediaPlayer?.duration ?: 0, mediaPlayer?.currentPosition ?: 0, false)
                 .build()
 
             startForeground(notificationId, notification)
     }
+
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -127,6 +140,11 @@ class MyService : Service() {
 
                 }
                 isPlaying = false
+                showNotification()
+            }
+            "SEEK" -> {
+                val seekTo = intent.getIntExtra("seekTo", 0)
+                mediaPlayer?.seekTo(seekTo)
                 showNotification()
             }
             "PREVIOUS" -> {
