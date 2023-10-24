@@ -7,6 +7,7 @@ import android.media.MediaPlayer
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.media.app.NotificationCompat.MediaStyle
 
 class MyService : Service() {
@@ -22,18 +23,35 @@ class MyService : Service() {
         mediaPlayer = MediaPlayer.create(this, R.raw.song2)
     }
 
+    private val songLyrics = arrayOf(
+        "Mood Swing Misery - Pouya, Rocci",
+        "muscles - not dvr",
+        "Baby When the Light - JKRS, AIZZO",
+        "Kill Me Nice - Carter tomorrow",
+        "busy dying - forgottenposse, myle$, faeri"
+    )
+    private var isPlaying = false
+
     @SuppressLint("UnspecifiedImmutableFlag")
     private fun showNotification() {
         createNotificationChannel()
 
-        val playIntent = Intent(this, MyService::class.java).apply {
-            action = "PLAY"
+        val playIntent = if (isPlaying) {
+            Intent(this, MyService::class.java).apply {
+                action = "PAUSE"
+            }
+        } else {
+            Intent(this, MyService::class.java).apply {
+                action = "PLAY"
+            }
         }
+
         val playPendingIntent = PendingIntent.getService(this, 0, playIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         val stopIntent = Intent(this, MyService::class.java).apply {
             action = "STOP"
         }
+
         val stopPendingIntent = PendingIntent.getService(this, 1, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         val previousIntent = Intent(this, MyService::class.java).apply {
@@ -44,24 +62,30 @@ class MyService : Service() {
         val nextIntent = Intent(this, MyService::class.java).apply {
             action = "NEXT"
         }
+
         val nextPendingIntent = PendingIntent.getService(this, 3, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
-        val notification = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_music)
-            .setContentTitle("Now Playing")
-            .setContentText("Song Title")
-            .addAction(R.drawable.ic_previous, "Previous", previousPendingIntent)
-            .addAction(R.drawable.ic_play, "Play", playPendingIntent)
-            .addAction(R.drawable.ic_stop2, "Stop", stopPendingIntent)
-            .addAction(R.drawable.ic_next, "Next", nextPendingIntent)
-            .setStyle(MediaStyle()
-                .setShowActionsInCompactView(0, 1, 2, 3))
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setAutoCancel(false)
-            .setOngoing(true)
-            .build()
+            val notification = NotificationCompat.Builder(this, channelId)
+                .setSmallIcon(R.drawable.ic_music)
+                .setContentTitle("Now Playing")
+                .setContentText(songLyrics[currentSongPosition])
+                .addAction(R.drawable.ic_previous, "Previous", previousPendingIntent)
+//                .addAction(R.drawable.ic_play, "Play", playPendingIntent)
+                .addAction(if (isPlaying) R.drawable.ic_baseline_pause_24 else R.drawable.ic_play
+                , if (isPlaying) "Pause" else "Play", playPendingIntent)
+//                .addAction(R.drawable.ic_stop2, "Stop", stopPendingIntent)
+                .addAction(R.drawable.ic_next, "Next", nextPendingIntent)
 
-        startForeground(notificationId, notification)
+                .setStyle(
+                    MediaStyle()
+                        .setShowActionsInCompactView(0, 1, 2, 3)
+                )
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(false)
+                .setOngoing(true)
+                .build()
+
+            startForeground(notificationId, notification)
     }
 
     private fun createNotificationChannel() {
@@ -84,21 +108,34 @@ class MyService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent != null) when (intent.action) {
             "PLAY" -> {
-                mediaPlayer?.start()
+                if (mediaPlayer?.isPlaying != true) {
+                    mediaPlayer?.start()
+                }
                 playSong()
                 showNotification()
+            }
+            "PAUSE" -> {
+                if (mediaPlayer?.isPlaying == true) {
+                    mediaPlayer?.pause()
+                }
+                    isPlaying = false
+                    showNotification()
             }
             "STOP" -> {
                 if (mediaPlayer?.isPlaying == true) {
                     mediaPlayer?.stop()
 
                 }
+                isPlaying = false
+                showNotification()
             }
             "PREVIOUS" -> {
                 playPreviousSong()
+                showNotification()
             }
             "NEXT" -> {
                 playNextSong()
+                showNotification()
             }
         }
         return START_STICKY
@@ -110,12 +147,21 @@ class MyService : Service() {
             mediaPlayer?.reset()
             mediaPlayer = MediaPlayer.create(this, songList[currentSongPosition])
             mediaPlayer?.start()
+            isPlaying = true
+            sendSongChangeBroadcast()
         }
+    }
+
+    private fun sendSongChangeBroadcast(){
+        val intent = Intent("SONG_CHANGE")
+        intent.putExtra("songLyrics", songLyrics[currentSongPosition])
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
     private fun playSong(){
         mediaPlayer?.reset()
         mediaPlayer = MediaPlayer.create(this, songList[currentSongPosition])
+        isPlaying = true
         mediaPlayer?.start()
     }
 
@@ -123,6 +169,7 @@ class MyService : Service() {
         if (currentSongPosition < songList.size - 1) {
             currentSongPosition++
             mediaPlayer?.reset()
+            isPlaying = true
             mediaPlayer = MediaPlayer.create(this, songList[currentSongPosition])
             mediaPlayer?.start()
         }
