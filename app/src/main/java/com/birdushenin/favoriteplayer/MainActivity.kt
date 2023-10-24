@@ -14,11 +14,30 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val playButton = binding.start
+        val stopButton = binding.pause
+        val nextButton = binding.next
+        val backButton = binding.back
 
         playButton.setOnClickListener {
             val serviceIntent = Intent(this, MyService::class.java)
             serviceIntent.action = "PLAY"
             startService(serviceIntent)
         }
+        stopButton.setOnClickListener {
+            val serviceIntent = Intent(this, MyService::class.java)
+            serviceIntent.action = "STOP"
+            startService(serviceIntent)
+        }
+        nextButton.setOnClickListener {
+            val serviceIntent = Intent(this, MyService::class.java)
+            serviceIntent.action = "NEXT"
+            startService(serviceIntent)
+        }
+        backButton.setOnClickListener {
+            val serviceIntent = Intent(this, MyService::class.java)
+            serviceIntent.action = "PREVIOUS"
+            startService(serviceIntent)
+        }
+
     }
 }

@@ -14,13 +14,15 @@ class MyService : Service() {
     private var mediaPlayer: MediaPlayer? = null
     private val channelId = "MusicChannel"
     private val notificationId = 1
-    private val songList = intArrayOf(R.raw.song1, R.raw.song2, R.raw.song3)
+    private val songList = intArrayOf(R.raw.song2, R.raw.song3, R.raw.song4,  R.raw.song1,
+        R.raw.song5)
     private var currentSongPosition = 0
     override fun onCreate() {
         super.onCreate()
-        mediaPlayer = MediaPlayer.create(this, R.raw.song1)
+        mediaPlayer = MediaPlayer.create(this, R.raw.song2)
     }
 
+    @SuppressLint("UnspecifiedImmutableFlag")
     private fun showNotification() {
         createNotificationChannel()
 
@@ -50,7 +52,7 @@ class MyService : Service() {
             .setContentText("Song Title")
             .addAction(R.drawable.ic_previous, "Previous", previousPendingIntent)
             .addAction(R.drawable.ic_play, "Play", playPendingIntent)
-            .addAction(R.drawable.ic_play, "Stop", stopPendingIntent)
+            .addAction(R.drawable.ic_stop2, "Stop", stopPendingIntent)
             .addAction(R.drawable.ic_next, "Next", nextPendingIntent)
             .setStyle(MediaStyle()
                 .setShowActionsInCompactView(0, 1, 2, 3))
@@ -62,10 +64,9 @@ class MyService : Service() {
         startForeground(notificationId, notification)
     }
 
-
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(channelId, "Music Channel", NotificationManager.IMPORTANCE_DEFAULT)
+            val channel = NotificationChannel(channelId, "Music Channel", NotificationManager.IMPORTANCE_LOW)
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
         }
@@ -81,29 +82,23 @@ class MyService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent != null) {
-            val action = intent.action
-            when (action) {
-                "PLAY" -> {
-                    //if (mediaPlayer?.isPlaying == true) {
-                    mediaPlayer?.start()
-                    showNotification()
-                    //}
+        if (intent != null) when (intent.action) {
+            "PLAY" -> {
+                mediaPlayer?.start()
+                playSong()
+                showNotification()
+            }
+            "STOP" -> {
+                if (mediaPlayer?.isPlaying == true) {
+                    mediaPlayer?.stop()
+
                 }
-                "STOP" -> {
-                    if (mediaPlayer?.isPlaying == true) {
-                        mediaPlayer?.stop()
-                        showNotification()
-                    }
-                }
-                "PREVIOUS" -> {
-                    // Обработка действия "Previous"
-                    playPreviousSong()
-                }
-                "NEXT" -> {
-                    // Обработка действия "Next"
-                    playNextSong()
-                }
+            }
+            "PREVIOUS" -> {
+                playPreviousSong()
+            }
+            "NEXT" -> {
+                playNextSong()
             }
         }
         return START_STICKY
@@ -115,8 +110,13 @@ class MyService : Service() {
             mediaPlayer?.reset()
             mediaPlayer = MediaPlayer.create(this, songList[currentSongPosition])
             mediaPlayer?.start()
-            showNotification()
         }
+    }
+
+    private fun playSong(){
+        mediaPlayer?.reset()
+        mediaPlayer = MediaPlayer.create(this, songList[currentSongPosition])
+        mediaPlayer?.start()
     }
 
     private fun playNextSong() {
@@ -125,7 +125,6 @@ class MyService : Service() {
             mediaPlayer?.reset()
             mediaPlayer = MediaPlayer.create(this, songList[currentSongPosition])
             mediaPlayer?.start()
-            showNotification()
         }
     }
 }
