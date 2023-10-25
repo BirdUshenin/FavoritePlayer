@@ -15,7 +15,6 @@ class MainActivity : AppCompatActivity() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == "SONG_CHANGED") {
                 val songLyrics = intent.getStringExtra("songLyrics")
-                // Обновите отображение текста песни в вашей активности
             }
         }
     }
@@ -59,7 +58,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // Отмена регистрации приемника при уничтожении активности
         LocalBroadcastManager.getInstance(this).unregisterReceiver(songChangeReceiver)
     }
 }

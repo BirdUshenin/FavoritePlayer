@@ -7,8 +7,12 @@ import android.media.MediaPlayer
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.media.app.NotificationCompat.MediaStyle
+import android.content.Context
+
+
 
 class MyService : Service() {
 
@@ -64,14 +68,10 @@ class MyService : Service() {
         }
 
         val nextPendingIntent = PendingIntent.getService(this, 3, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-//        val seekIntent = Intent(this, MyService::class.java).apply {
-//            action = "SEEK"
-//            putExtra("seekTo", newPosition)
-//        }
-//        startService(seekIntent)
-
 
             val notification = NotificationCompat.Builder(this, channelId)
+                .setColor(ContextCompat.getColor(this, R.color.purple_200))
+
                 .setSmallIcon(R.drawable.ic_music)
                 .setContentTitle("Now Playing")
                 .setContentText(songLyrics[currentSongPosition])
@@ -82,19 +82,17 @@ class MyService : Service() {
 //                .addAction(R.drawable.ic_stop2, "Stop", stopPendingIntent)
                 .addAction(R.drawable.ic_next, "Next", nextPendingIntent)
 
+                .setSound(null)
+
                 .setStyle(
                     MediaStyle()
                         .setShowActionsInCompactView(0, 1, 2, 3)
-//                        .setShowProgressBar(true)
                         .setMediaSession(null)
                 )
-
-
 
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(false)
                 .setOngoing(true)
-                .setProgress(mediaPlayer?.duration ?: 0, mediaPlayer?.currentPosition ?: 0, false)
                 .build()
 
             startForeground(notificationId, notification)
@@ -103,9 +101,11 @@ class MyService : Service() {
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(channelId, "Music Channel", NotificationManager.IMPORTANCE_LOW)
+            val channel = NotificationChannel(channelId, "Music Channel", NotificationManager.IMPORTANCE_HIGH)
             val notificationManager = getSystemService(NotificationManager::class.java)
+            channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             notificationManager.createNotificationChannel(channel)
+
         }
     }
 
@@ -124,6 +124,7 @@ class MyService : Service() {
                 if (mediaPlayer?.isPlaying != true) {
                     mediaPlayer?.start()
                 }
+//                isPlaying = true
                 playSong()
                 showNotification()
             }
@@ -140,11 +141,6 @@ class MyService : Service() {
 
                 }
                 isPlaying = false
-                showNotification()
-            }
-            "SEEK" -> {
-                val seekTo = intent.getIntExtra("seekTo", 0)
-                mediaPlayer?.seekTo(seekTo)
                 showNotification()
             }
             "PREVIOUS" -> {
